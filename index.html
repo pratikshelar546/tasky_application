@@ -11,17 +11,18 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
     integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="/style/style.css"/>
-   
+  <link rel="stylesheet" href="/style/style.css" />
+
 </head>
 
-<body>
+<body onload="loadInitialData()">
+
   <!-- fixed bottom btn for mobile-->
   <div class="add__new__btn__mobile__only">
-  <button type="button" class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal"
-  data-bs-target="#addNewItem">
-  <i class="fas fa-plus"></i> add item </button>
-</div>
+    <button type="button" class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal"
+      data-bs-target="#addNewItem">
+      <i class="fas fa-plus"></i> add item </button>
+  </div>
   <!-- Modal -->
   <div class="modal fade" id="addNewItem" tabindex="-1" aria-labelledby="add_task_btn" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -31,10 +32,10 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form>
+          <form onsubmit="return false">
             <div class="mb-3">
               <label for="imageurl" class="form-label">Image URL</label>
-              <input type="url" class="form-control" id="imageurl" placeholder="http://example.com/image.png" >
+              <input type="text" class="form-control" id="imageurl" placeholder="http://example.com/image.png">
 
             </div>
             <div class="mb-3">
@@ -47,17 +48,38 @@
             </div>
             <div class="mb-3">
               <label for="taskdiscription">Task description</label>
-              <textarea class="form-control" id="taskdiscription" placeholder="Explain somthing about it.." rows="4" required></textarea>
+              <textarea class="form-control" id="taskdiscription" placeholder="Explain somthing about it.." rows="4"
+                required></textarea>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary">Save changes</button>
-            </div>
+
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" onclick="handleSubmit()">
+              Save changes
+            </button>
+
           </form>
         </div>
       </div>
     </div>
   </div>
+  </div>
+  <!-- modal for ui display card on home page -->
+  <div class="modal fade" id="showtask" tabindex="-1" aria-labelledby="showTaskLable" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fs-5" id="showTaskLable">Task Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body task__modal__body">
+          <!-- <p>js text</p> -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          
+        </div>
+      </div>
+    </div>
   </div>
   <!-- ?nav bar -->
   <nav class="navbar navbar-expand-lg bg-light">
@@ -81,7 +103,10 @@
       </div>
     </div>
   </nav>
-  <!-- container search -->
+
+
+
+  <!-- body container search bar nd card  -->
   <div class="container">
     <section class="mt-4">
       <div class="row justify-content-center">
@@ -96,14 +121,14 @@
         </div>
       </div>
     </section>
+ 
+    <section class="mt-4 text-center">
+      <div class="row  task__content">
+        <h1>This is the place where you will get all the card <h1>
+      </div>
+
+    </section>
   </div>
-  <!--  card container -->
-  <section class="mt-4 text-center">
-    <div class="row m-0 task_container">
-      <h1>This is the place where you will get all the card <h1>
-    </div>
-
-  </section>
 
 
 
@@ -111,7 +136,7 @@
 
 
 
-<script type="text/javascript" src="/script/script.js"></script>
+  <script type="text/javascript" src="/script/script.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
     integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"

@@ -1,33 +1,143 @@
 const state = {
     taskList: [],
 };
+// dom manipulation
+const taskModal = document.querySelector(".task__modal__body");
 
-// to create card on ui
-const htmlTaskContent = ({ id, url, title, type, description }) => {
-    return `<div class='col md-6 col-lg-4 mt-3' id=${id} key=${id}>
+const taskContent = document.querySelector(".task__content");
+// store data in localstorage
+
+const htmlTaskContent = ({ id, title, description, type, url }) => `
+          
+  <div class='col-md-6 col-lg-4 mt-3 '  id=${id} key=${id}>
     <div class='card shadow-sm task__card'>
-    <div class='card-header d-flex gap-2 justify-content-end task__card__header'>
-    <button type='button' class='btn btn-outline-info mr-2' name=${id}>
-    <i class='fa fa-pencil-alt name =${id}></i>
-    </button>
-    <button type='button' class="btn btn-outline-danger mr-2'name=${id}>
-    <i class='fa fa-trash-alt' name=${id}></i>
-    </button>
+      <div class='card-header d-flex gap-2 justify-content-end task__card__header'>
+        <button type='button' class='btn btn-outline-info mr-2' name=${id} onclick="editTask.apply(this, arguments)">
+          <i class='fas fa-pencil-alt' name=${id}></i>
+        </button>
+        <button type='button' class='btn btn-outline-danger mr-2' name=${id} onclick="deleteTask.apply(this, arguments)">
+          <i class='fas fa-trash-alt' name=${id}></i>
+        </button>
+      </div>
+      <div class='card-body'>
+        ${
+          url
+            ? `<img width='100%' height='200px' style='object-fit: cover; object-position: center'  src=${url} alt='card image ' class='card-image-top md-3 rounded-lg' />`
+            : `<img width='100%' height='150px' style="object-fit: cover; object-position: center"  src="https://tse3.mm.bing.net/th?id=OIP.LZsJaVHEsECjt_hv1KrtbAHaHa&pid=Api&P=0" alt='card image cap' class='card-image-top md-3 rounded-lg' />`
+        }
+        <h4 class='task__card__title'>${title}</h4>
+        <p class='description trim-3-lines text-muted' data-gram_editor='false'>
+          ${description}
+        </p>
+        <div class='tags text-white d-flex flex-wrap'>
+          <span class='badge bg-primary m-1'>${type}</span>
+        </div>
+      </div>
+      <div class='card-footer'>
+        <button 
+        type='button' 
+        class='btn btn-outline-primary float-right' 
+        data-bs-toggle='modal'
+        data-bs-target='#showtask'
+        id=${id}
+        onclick='openTask.apply(this, arguments)'>
+          Open Task
+        </button>
+      </div>
     </div>
-    <div class='card-body'>
-    ${
-        url && `<img width='100%' class='card-image-top md-3 rounded-lg'/ alt='card image here' src=${url} ` 
+  </div>
+`;
+// to create card on ui
+
+
+
+// to display details on different modal
+const htmlModalContent = ({ id, title, description, type, url }) => {
+    const date = new Date(parseInt(id));
+    return `
+<div id=${id}>
+
+       ${
+        url ?`<img width='100%' src=${url} alt='card image here' class='img-fluid place__holder__image mb-3'/>` 
+        :`<img width='100%' height='150px' style="object-fit: cover; object-position: center"  src="https://tse3.mm.bing.net/th?id=OIP.LZsJaVHEsECjt_hv1KrtbAHaHa&pid=Api&P=0" alt='card image cap' class='card-image-top md-3 rounded-lg' />`
+       }
+<strong class='text-sm text-muted'>Created on ${date.toDateString()}</strong>
+</div>
+<h2 class='my-3'>${title}</h2>
+<span class='badge bg-primary m-1'>${type}</span>
+<p class='lead'>${description}</p>
+`;
+};
+
+const updateLocalStorage = () => {
+  localStorage.setItem("task", JSON.stringify({
+        tasks: state.taskList,
+    })
+    );
+};
+
+// get data from localstorage
+
+const loadInitialData = () => {
+    const localStorageCopy = JSON.parse(localStorage.task);
+
+    if (localStorageCopy) state.taskList = localStorageCopy.tasks;
+
+    state.taskList.map((cardData) => {
+  taskContent.insertAdjacentHTML("beforeend", htmlTaskContent(cardData));
+    });
+};
+
+// after clicking on button save task we need to submit it
+const handleSubmit = (event) => {
+  console.log("button clicked");
+    const id = `${Date.now()}`;
+    const input = {
+      url: document.getElementById("imageurl").value,
+              title: document.getElementById("tasktitle").value,
+              type: document.getElementById("tasktype").value,
+              description: document.getElementById("taskdiscription").value,
+    };
+    // console.log({...input,id});
+    if (input.title === "" || input.type === "" || input.description === "") {
+      return alert("Please Fill All The Fields");
     }
-    <h4 class='task__title'>${title}</h4>
-    <p class='task__description trim-3-lines text-muted' data-gram_editor='false'>${description}</p>
-    <div class='tags text-white d-flex flex-wrap'>
-    <span class='badge bg-primary m-1'>${type}</span>
-    </div>
-    </div>
-    <div class='card-footer'>
-    <button type='button' class='btn btn-outline-primary' float-right data-bs-toggle='modal' data-bs-toggle='#showTask' id=${id}></button>
-    </div>
-    </div>
-    </div>`;
-} 
-console.log(htmlTaskContent);
+    
+    // updated task list - for 1st go
+    state.taskList.push({ ...input, id });
+    console.log(state.taskList);
+    // update the same on localStorage too
+    updateLocalStorage();
+    taskContent.insertAdjacentHTML(
+      "beforeend",
+      htmlTaskContent({
+        ...input,
+        id,
+      })
+    );
+  };
+
+
+// to open task in modal
+const openTask = (e)=>{
+  if(!e) e= window.event;
+
+
+  const getTask = state.taskList.find(({id})=> id === e.target.id
+  );
+  taskModal.innerHTML = htmlModalContent(getTask);
+};
+
+// delete task
+const  deleteTask =(e)=>{
+  if(!e) e= window.event;
+
+  const targetId = e.target.getAttribute("name");
+  // console.log(targetId);
+
+  const type = e.target.tagName;
+  // console.log(type);
+
+  const removeTask = state.taskList.filter(({id})=> id !== targetId);
+  console.log(removeTask);
+}
